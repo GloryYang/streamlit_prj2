@@ -66,6 +66,10 @@ def get_financial_data(code):
     df["季度"] = df["报告期"].dt.quarter.map({1: "Q1", 2: "Q2", 3: "Q3", 4: "Q4"})
     df["报告期"] = df["报告期"].dt.strftime("%Y-%m-%d")
 
+    for col in ["营业收入", "净利润"]:
+        if col in df.columns:
+            df[col] = pd.to_numeric(df[col], errors="coerce")
+    
     # ---- 计算同比 ----
     if "营业收入" in df.columns:
         df["营业收入同比(%)"] = df["营业收入"].pct_change(4) * 100
@@ -99,7 +103,7 @@ if stock_code:
             color_discrete_sequence=px.colors.qualitative.Set2
         )
         fig1.update_layout(xaxis_tickangle=-45)
-        st.plotly_chart(fig1, use_container_width=True)
+        st.plotly_chart(fig1, width="stretch")
 
         # ---- 图2：同比折线图 ----
         if f"{selected}同比(%)" in df.columns:
@@ -112,12 +116,13 @@ if stock_code:
                 line_shape="spline"
             )
             fig2.update_layout(xaxis_tickangle=-45)
-            st.plotly_chart(fig2, use_container_width=True)
+            st.plotly_chart(fig2, width="stretch")
 
         # ---- 展示原始数据 ----
         with st.expander("📋 查看原始数据"):
-            st.dataframe(df, use_container_width=True)
+            st.dataframe(df, width="stretch")
     else:
         st.warning("未获取到财务数据，请检查股票代码或网络连接。")
 else:
     st.info("请输入股票代码开始分析。")
+
