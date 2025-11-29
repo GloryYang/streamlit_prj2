@@ -4,7 +4,7 @@ import plotly.express as px
 
 st.set_page_config(layout="wide")
 
-# 横向滚动 CSS
+# CSS 横向滚动
 st.markdown("""
 <style>
 div[data-baseweb="segmented-control"] {
@@ -29,13 +29,18 @@ df = pd.DataFrame({
     "销售净利率": [10,18,15,12,13]
 })
 
-metrics = list(df.columns[1:])
+# 所有列名都转为字符串
+metrics = [str(c) for c in df.columns[1:]]
 
-# 横向滑动 segmented_control
 choice = st.segmented_control("选择指标：", metrics)
 
-# 图表逻辑（你可以加更多）
-fig = None
+st.write("当前选择：", choice)
+
+# 防止 choice 为 None
+if not isinstance(choice, str):
+    st.stop()
+
+# 根据指标类型选择图表
 if "率" in choice:
     fig = px.line(df, x="year", y=choice, markers=True)
 else:
